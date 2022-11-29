@@ -102,5 +102,36 @@ select * from bankAccount;
 (query 2)
 select customer_name from borrower where customer_name not in (
 select distinct customer_name from depositer);
+(query 1)
+select d.customer_name
+from depositer d
+inner join bankAccount a
+on d.accno=a.accno
+inner join branch b
+on a.branch_name=b.branch_name
+group by d.customer_name,b.branch_city
+having count(distinct b.branch_name) =
+( select count(p.branch_name) 
+ from branch p where		
+ p.branch_city='delhi')
+;
+(query 3)
+select distinct d.customer_name
+from depositer d
+where d.customer_name in(
+select distinct b.customer_name
+from borrower b, loan l, branch br
+where b.loan_no=l.loan_no and l.branch_name=br.branch_name and br.branch_city='bangalore');
+(query 5)
+update bankAccount
+set balance=balance+0.05*balance;
+select * from bankAccount;
+(query 6)
+delete from bankAccount
+where branch_name in(select branch_name from branch
+where branch_city='bombay');
+spot:
+delete from branch where branch_city='bangalore';
+
 
 
