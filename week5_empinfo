@@ -6,7 +6,7 @@ dname varchar(20),
 dloc varchar(20),
 PRIMARY KEY(deptno)
 );
-drop table dept;
+
 create table employee(
 empno int,
 ename varchar(20),
@@ -17,7 +17,7 @@ deptno int,
 PRIMARY KEY(empno),
 FOREIGN KEY(deptno) REFERENCES dept(deptno)
 ON UPDATE CASCADE ON DELETE CASCADE);
-drop table employee;
+
 create table incentives(
 empno int,
 incentive_date date,
@@ -32,8 +32,7 @@ ploc varchar(20),
 pname varchar(20),
 PRIMARY KEY(pno)
 );
-set foreign_key_checks=1;
-drop table project;
+
 create table assigned_to(
 empno int,
 pno int,
@@ -42,7 +41,7 @@ FOREIGN KEY(empno) REFERENCES employee(empno)
 ON UPDATE CASCADE ON DELETE CASCADE,
 FOREIGN KEY(pno) REFERENCES project(pno)
 ON UPDATE CASCADE ON DELETE CASCADE);
-drop table assigned_to;
+
 insert into dept values(1,'finance','delhi');
 insert into dept values(2,'it','bangalore');
 insert into dept values(3,'marketing','hyderabad');
