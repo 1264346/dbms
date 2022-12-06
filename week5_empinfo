@@ -25,7 +25,7 @@ incentive_amount double,
 PRIMARY KEY(incentive_date),
 FOREIGN KEY(empno) REFERENCES employee(empno)
 ON UPDATE CASCADE ON DELETE CASCADE);
-drop table incentives;
+
 create table project(
 pno int,
 ploc varchar(20),
@@ -49,14 +49,16 @@ insert into dept values(4,'logistics','telangana');
 insert into dept values(5,'RandD','kerala');
 insert into dept values(6,'development','bombay');
 select * from dept;
-insert into employee values(1,'avinash',10,'2022-12-01',30000,3);
-insert into employee values(2,'dinesh',20,'2022-09-16',90000,2);
-insert into employee values(3,'balaji',30,'2020-01-29',50000,1);
-insert into employee values(4,'nikil',40,'2021-06-11',20000,4);
-insert into employee values(5,'ravi',50,'2018-07-23',80000,5);
-insert into employee values(6,'ganesh',60,'2014-10-11',55000,6);
-insert into employee values(7,'ram',70,'2015-11-15',99000,2);
-insert into employee values(8,'shivani',80,'2020-08-09',70000,6);
+insert into employee values(1,'avinash',5,'2022-12-01',30000,3);
+insert into employee values(2,'dinesh',3,'2022-09-16',90000,2);
+insert into employee values(3,'balaji',7,'2020-01-29',50000,1);
+insert into employee values(4,'nikil',8,'2021-06-11',20000,4);
+insert into employee values(5,'ravi',6,'2018-07-23',80000,5);
+insert into employee values(6,'ganesh',7,'2014-10-11',55000,6);
+insert into employee values(7,'ram',7,'2014-08-08',99000,2);
+insert into employee values(8,'shivani',null,'2020-08-09',70000,6);
+set foreign_key_checks=1;
+drop table employee;
 select * from employee;
 insert into incentives values(1,'2023-05-09',10000);
 insert into incentives values(2,'2023-12-27',22500);
@@ -72,6 +74,7 @@ insert into project values(4,'delhi','covidChar');
 insert into project values(5,'bangalore','finManModel');
 insert into project values(6,'mumbai','goods_marketing');
 insert into project values(7,'mysuru','hostel_website');
+insert into project values(8,'kerala','soil_enrichment');
 select * from project;
 insert into assigned_to values(1,2,'statician');
 insert into assigned_to values(3,5,'financier');
@@ -80,10 +83,12 @@ insert into assigned_to values(5,1,'developer');
 insert into assigned_to values(7,3,'developer');
 insert into assigned_to values(8,4,'scientist');
 insert into assigned_to values(2,7,'developer');
+insert into assigned_to values(5,8,'ag_scientist');
 select * from assigned_to;
 update dept
 set dloc='mumbai'
 where deptno=6;
+delete from assigned_to where empno=5;
 
 select assigned_to.empno
 from assigned_to,project
@@ -91,9 +96,9 @@ where assigned_to.pno=project.pno and project.ploc in('bangalore','hyderabad','m
 
 select empno
 from employee
-where empno not in(select incentives.empno
-from employee cross join incentives
-on employee.empno=incentives.empno);
+where empno not in(select empno
+from incentives
+);
 
 select e.ename,e.empno,d.dname,a.job_role,d.dloc,p.ploc
 from employee e, dept d, assigned_to a, project p
@@ -101,3 +106,7 @@ where d.deptno=e.deptno
 and e.empno=a.empno
 and a.pno=p.pno
 and p.ploc=d.dloc;
+
+select e.ename, d.dname, a.job_role, max(i.incentive_amount)
+from employee e, dept d, assigned_to a, incentives i
+where i.incentive_date between '2023-01-01'and'2023-12-31';
