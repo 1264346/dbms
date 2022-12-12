@@ -1,0 +1,139 @@
+create database emp;
+use emp;
+create table dept(
+deptno int,
+dname varchar(20),
+dloc varchar(20),
+PRIMARY KEY(deptno)
+);
+create table employee(
+empno int,
+ename varchar(20),
+mgr_no int,
+hiredate date,
+sal double,
+deptno int,
+PRIMARY KEY(empno),
+FOREIGN KEY(deptno) REFERENCES dept(deptno)
+ON UPDATE CASCADE ON DELETE CASCADE);
+create table incentives(
+empno int,
+incentive_date date,
+incentive_amount double,
+PRIMARY KEY(incentive_date),
+FOREIGN KEY(empno) REFERENCES employee(empno)
+ON UPDATE CASCADE ON DELETE CASCADE);
+create table project(
+pno int,
+ploc varchar(20),
+pname varchar(20),
+PRIMARY KEY(pno)
+);
+set foreign_key_checks=1;
+create table assigned_to(
+empno int,
+pno int,
+job_role varchar(20),
+FOREIGN KEY(empno) REFERENCES employee(empno)
+ON UPDATE CASCADE ON DELETE CASCADE,
+FOREIGN KEY(pno) REFERENCES project(pno)
+ON UPDATE CASCADE ON DELETE CASCADE);
+insert into dept values(1,'finance','delhi');
+insert into dept values(2,'it','bangalore');
+insert into dept values(3,'marketing','hyderabad');
+insert into dept values(4,'logistics','telangana');
+insert into dept values(5,'RandD','kerala');
+insert into dept values(6,'development','mumbai');
+select * from dept;
+insert into employee values(1,'avinash',5,'2022-12-01',30000,3);
+insert into employee values(2,'dinesh',3,'2022-09-16',90000,2);
+insert into employee values(3,'balaji',7,'2020-01-29',50000,1);
+insert into employee values(4,'nikil',7,'2021-06-11',20000,4);
+insert into employee values(5,'ravi',6,'2018-07-23',80000,5);
+insert into employee values(6,'ganesh',7,'2014-10-11',55000,6);
+insert into employee values(7,'ram',8,'2014-08-08',99000,2);
+insert into employee values(8,'shivani',null,'2020-08-09',70000,6);
+select * from employee;
+insert into incentives values(1,'2023-05-09',10000);
+insert into incentives values(2,'2023-12-27',22500);
+insert into incentives values(3,'2019-01-23',15000);
+insert into incentives values(5,'2019-01-10',20000);
+insert into incentives values(7,'2016-03-30',10000);
+insert into incentives values(8,'2021-04-08',21000);
+insert into incentives values(4,'2019-01-19',18000);
+insert into incentives values(6,'2019-01-06',20000);
+drop table incentives;
+select * from incentives;
+insert into project values(1,'bangalore','govt_apps');
+insert into project values(2,'hyderabad','pop_stats');
+insert into project values(3,'mysuru','onlineWebsite');
+insert into project values(4,'delhi','covidChar');
+insert into project values(5,'bangalore','finManModel');
+insert into project values(6,'mumbai','goods_marketing');
+insert into project values(7,'mysuru','hostel_website');
+insert into project values(8,'kerala','soil_enrichment');
+select * from project;
+insert into assigned_to values(1,2,'statician');
+insert into assigned_to values(3,5,'financier');
+insert into assigned_to values(4,6,'marketing_engg');
+insert into assigned_to values(7,3,'developer');
+insert into assigned_to values(8,4,'scientist');
+insert into assigned_to values(2,7,'developer');
+insert into assigned_to values(5,8,'ag_scientist');
+select * from assigned_to;
+select e1.ename
+from employee e1, employee e2
+where e1.empno=e2.mgr_no
+group by e1.ename
+having count(e1.ename) in (select max((select count(e1.ename)
+from employee e1, employee e2
+where e1.empno=e2.mgr_no
+group by e1.ename)));
+
+select e1.ename
+from employee e1, employee e2
+where e1.empno=e2.mgr_no
+group by e1.ename
+having count(e1.mgr_no)=(select count(e1.ename)
+from employee e1, employee e2
+where e1.empno=e2.mgr_no
+group by e1.ename order by count(e1.ename) desc limit 1);
+
+update employee
+set mgr_no=5
+where empno=2;
+
+update employee
+set deptno=2
+where empno=8;
+select * from employee;
+update incentives
+set incentive_amount=19500
+where empno=5;
+
+
+select e1.ename
+from employee e1, employee e2
+having e1.sal>(select avg(e2.sal)
+from employee e1, employee e2
+where e1.empno=e2.mgr_no
+group by e1.mgr_no);
+
+
+SELECT m.ename
+FROM employee m
+WHERE m.empno IN
+    (SELECT mgr_no
+     FROM employee)
+  AND m.sal >
+    (SELECT avg(e.sal)
+     FROM employee e
+     WHERE e.mgr_no = m.empno );
+     
+select e.empno, e.ename, e.mgr_no, e.hiredate, e.sal, e.deptno from incentives i,employee e where i.empno=e.empno
+and i.incentive_amount=(select max(incentive_amount) from incentives where incentive_date like '2019-01%' and incentive_amount!=(select max(incentive_amount) from incentives where incentive_date like '2019-01%'));
+select * from incentives;
+
+select e2.ename
+from employee e1, employee e2
+where e1.empno=e2.mgr_no and e1.deptno=e2.deptno;
