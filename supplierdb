@@ -1,0 +1,77 @@
+create database supp;
+use supp;
+create table supplier(
+sid int,
+sname varchar(20),
+city varchar(10),
+PRIMARY KEY(sid)
+);
+create table parts(
+pid int,
+pname varchar(10),
+color varchar(10),
+PRIMARY KEY(pid)
+);
+create table catalog(
+sid int,
+pid int,
+cost double,
+foreign key(sid) references supplier(sid) on update cascade on delete cascade,
+foreign key(pid) references parts(pid) on update cascade on delete cascade
+);
+
+insert into supplier values(10001, 'Acme widget', 'bangalore');
+insert into supplier values(10002, 'Johns', 'kolkata');
+insert into supplier values(10003, 'Vimal', 'mumbai');
+insert into supplier values(10004, 'Reliance', 'delhi');
+select * from supplier;
+
+insert into parts values(20001, 'Book', 'Red');
+insert into parts values(20002, 'Pen', 'Red');
+insert into parts values(20003, 'Pencil', 'Green');
+insert into parts values(20004, 'Mobile', 'Green');
+insert into parts values(20005, 'Charger', 'Black');
+select * from parts;
+
+insert into catalog values(10001, 20001, 10);
+insert into catalog values(10001, 20002, 10);
+insert into catalog values(10001, 20003, 30);
+insert into catalog values(10001, 20004, 10);
+insert into catalog values(10001, 20005, 10);
+insert into catalog values(10002, 20001, 10);
+insert into catalog values(10002, 20002, 20);
+insert into catalog values(10003, 20003, 30);
+insert into catalog values(10004, 20003, 40);
+select * from catalog;
+
+/*1st query*/
+select p.pname
+from parts p
+where exists( select c.pid
+			  from catalog c
+              where c.pid=p.pid);
+
+/*2nd query*/
+select sname from supplier
+where sid in( select sid from catalog
+			  group by sid having count(sid)=( select count(pid) from parts));
+
+/*3d query*/
+select sname from supplier
+where sid in( select sid from catalog where pid in( select pid from parts where color='Red'));
+
+/*4th query*/
+select pname from parts where pid in( 
+									 select pid from catalog where sid in( select sid from supplier where sname='Acme widget'))
+and pid not in( select pid from catalog where sid in( select sid from supplier where sname!='Acme widget'));
+
+/*6th query*/
+select sname from supplier
+where sid in( select sid from catalog group by pid having cost =( select max(cost) from catalog group by pid));
+
+
+
+
+
+
+
