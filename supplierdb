@@ -65,6 +65,10 @@ select pname from parts where pid in(
 									 select pid from catalog where sid in( select sid from supplier where sname='Acme widget'))
 and pid not in( select pid from catalog where sid in( select sid from supplier where sname!='Acme widget'));
 
+/*5th query*/
+select c.sid from catalog c
+where c.cost >(select avg(b.cost) from catalog b where c.pid=b.pid group by b.pid);
+
 /*6th query*/
 select sname from supplier
 where sid in( select sid from catalog group by pid having cost =( select max(cost) from catalog group by pid));
