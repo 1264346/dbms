@@ -1,0 +1,88 @@
+create database flight;
+use flight;
+create table flights(
+flno int,
+fromPlace varchar(20),
+toPlace varchar(20),
+distance int,
+departs time,
+arrives time,
+price int,
+PRIMARY KEY(flno));
+create table aircraft(
+aid int,
+aname varchar(20),
+cruisingRange int,
+PRIMARY KEY(aid));
+create table employee(
+eid int,
+ename varchar(20),
+salary int,
+PRIMARY KEY(eid));
+create table certified(
+eid int,
+aid int,
+FOREIGN KEY(eid) REFERENCES employee(eid) on update cascade on delete cascade,
+FOREIGN KEY(aid) REFERENCES aircraft(aid) on update cascade on delete cascade);
+insert into employee values(101,'avinash',50000);
+insert into employee values(102,'lokesh',60000);
+insert into employee values(103,'rakesh',70000);
+insert into employee values(104,'santhosh',82000);
+insert into employee values(105,'tilak',5000);
+select * from employee;
+insert into aircraft values(1,'airbus',2000);
+insert into aircraft values(2,'boeing',700);
+insert into aircraft values(3,'jetairways',550);
+insert into aircraft values(4,'indigo',5000);
+insert into aircraft values(5,'boeing',4500);
+insert into aircraft values(6,'airbus',2200);
+select * from aircraft;
+insert into certified values(101,2);
+insert into certified values(101,4);
+insert into certified values(101,5);
+insert into certified values(101,6);
+insert into certified values(102,1);
+insert into certified values(102,3);
+insert into certified values(102,5);
+insert into certified values(103,2);
+insert into certified values(103,3);
+insert into certified values(103,5);
+insert into certified values(103,6);
+insert into certified values(104,6);
+insert into certified values(104,1);
+insert into certified values(104,3);
+insert into certified values(105,3);
+select * from certified;
+insert into flights values(1,'bengaluru','newDelhi',500,'06:00','09:00',5000);
+insert into flights values(2,'bengaluru','chennai',300,'07:00','08:30',3000);
+insert into flights values(3,'trivandrum','newDelhi',800,'08:00','11:30',6000);
+insert into flights values(4,'bengaluru','frankfurt',10000,'06:00','23:30',50000);
+insert into flights values(5,'kolkata','newDelhi',2400,'11:00','03:30',9000);
+insert into flights values(6,'bengaluru','frankfurt',8000,'09:00','23:00',40000);
+select * from flights;
+
+/*i. Find the names of aircraft such that all pilots certified to operate them have
+salaries more than Rs.80,000.*/
+select distinct(a.aname) from employee e inner join certified c
+on e.eid=c.eid and e.salary>80000 inner join aircraft a on a.aid=c.aid;
+
+/*ii. For each pilot who is certified for more than three aircrafts, find the eid and
+the maximum cruising range of the aircraft for which she or he is certified*/
+select c.eid, max(a.cruisingRange)
+from aircraft a, certified c
+where c.aid=a.aid group by c.eid having count(*)>=3;
+
+/*iii. Find the names of pilots whose salary is less than the price of the cheapest
+route from Bengaluru to Frankfurt.*/
+select ename from employee where salary<some(select price from flights where fromPlace='bengaluru' and toPlace='frankfurt');
+
+/*iv. For all aircraft with cruising range over 1000 Kms, find the name of the
+aircraft and the average salary of all pilots certified for this aircraft.*/
+select a.aname, avg(e.salary) as average from certified c inner join aircraft a on c.aid=a.aid and a.cruisingRange>1000 inner join employee e on e.eid=c.eid group by c.aid;
+
+/*v. Find the names of pilots certified for some Boeing aircraft*/
+select ename from employee where eid in(select eid from certified where aid in(select aid from aircraft where aname='boeing'));
+
+/*vi. Find the aids of all aircraft that can be used on routes from Bengaluru to
+New Delhi.*/
+select flno from flights where fromPlace='bengaluru' and toPlace='newDelhi';
